@@ -154,8 +154,11 @@ while not game_over:
 display_game_over()
 
 # Keep the game window open until the user closes it
-while True:
+running = True
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+            running = False
+
+# Quit the game
+pygame.quit()
