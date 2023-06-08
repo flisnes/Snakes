@@ -86,12 +86,14 @@ while running:
         or new_head1[1] < 0
         or new_head1[1] >= grid_height
         or new_head1 in snake1
+        or new_head1 in snake2
     ) or (
         new_head2[0] < 0
         or new_head2[0] >= grid_width
         or new_head2[1] < 0
         or new_head2[1] >= grid_height
         or new_head2 in snake2
+        or new_head2 in snake1
     ):
         running = False
 
