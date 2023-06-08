@@ -37,11 +37,20 @@ direction2 = "LEFT"
 game_over = False
 winner = None
 
-# Function to display game over message
+# Functions to display game over message
 def display_game_over():
     font = pygame.font.Font(None, 36)
-    text = font.render(f"Player {winner} wins!", True, WHITE)
-    text_rect = text.get_rect(center=(width // 2, height // 2))
+    text = font.render("Game Over - Tie!", True, WHITE)
+    text_rect = text.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2))
+    window.blit(text, text_rect)
+
+def display_winner(winner):
+    font = pygame.font.Font(None, 36)
+    if winner == 1:
+        text = font.render("Game Over - Player 1 Wins!", True, WHITE)
+    elif winner == 2:
+        text = font.render("Game Over - Player 2 Wins!", True, WHITE)
+    text_rect = text.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2))
     window.blit(text, text_rect)
 
 # Game loop
@@ -99,9 +108,11 @@ while not game_over:
             or new_head1 in snake1
             or new_head1 in snake2
         ):
-            game_over = True
-            winner = 2
-        elif (
+            collision1 = True
+        else:
+            collision1 = False
+        
+        if (
             new_head2[0] < 0
             or new_head2[0] >= grid_width
             or new_head2[1] < 0
@@ -109,6 +120,18 @@ while not game_over:
             or new_head2 in snake2
             or new_head2 in snake1
         ):
+            collision2 = True
+        else:
+            collision2 = False
+
+        # Determine the game over state
+        if collision1 and collision2:
+            game_over = True
+            winner = None
+        elif collision1:
+            game_over = True
+            winner = 2
+        elif collision2:
             game_over = True
             winner = 1
 
@@ -152,7 +175,10 @@ while not game_over:
 
 # Game over loop
 window.fill(BLACK)
-display_game_over()
+if winner is None:
+    display_game_over()
+else:
+    display_winner(winner)
 pygame.display.flip()
 
 # Keep the game window open until the user closes it
