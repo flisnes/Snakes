@@ -150,8 +150,10 @@ while not game_over:
     # Control the frame rate
     clock.tick(10)
 
-# Display the winner
+# Game over loop
+window.fill(BLACK)
 display_game_over()
+pygame.display.flip()
 
 # Keep the game window open until the user closes it
 running = True
