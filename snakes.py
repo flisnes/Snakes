@@ -1,5 +1,6 @@
 import pygame
 import random
+import importlib
 
 # Initialize Pygame
 pygame.init()
@@ -53,29 +54,20 @@ def display_winner(winner):
     text_rect = text.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2))
     window.blit(text, text_rect)
 
+# Import player controller scripts
+player1_controller = importlib.import_module("player1_controller")
+player2_controller = importlib.import_module("player2_controller")
+
 # Game loop
 while not game_over:
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_over = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and direction1 != "DOWN":
-                direction1 = "UP"
-            elif event.key == pygame.K_DOWN and direction1 != "UP":
-                direction1 = "DOWN"
-            elif event.key == pygame.K_LEFT and direction1 != "RIGHT":
-                direction1 = "LEFT"
-            elif event.key == pygame.K_RIGHT and direction1 != "LEFT":
-                direction1 = "RIGHT"
-            elif event.key == pygame.K_w and direction2 != "DOWN":
-                direction2 = "UP"
-            elif event.key == pygame.K_s and direction2 != "UP":
-                direction2 = "DOWN"
-            elif event.key == pygame.K_a and direction2 != "RIGHT":
-                direction2 = "LEFT"
-            elif event.key == pygame.K_d and direction2 != "LEFT":
-                direction2 = "RIGHT"
+
+    # Call the player controller functions
+    direction1 = player1_controller.move(snake1, snake2, food)
+    direction2 = player2_controller.move(snake1, snake2, food)
 
     # Update snake positions
     if not game_over:
