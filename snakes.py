@@ -24,6 +24,7 @@ grid_height = height // cell_size
 
 # Set up the clock to control the frame rate
 clock = pygame.time.Clock()
+fps = 5  # Lower value for slower game
 
 # Define the initial state of the game
 snake1 = [(grid_width // 4, grid_height // 2)]
@@ -130,7 +131,7 @@ while running:
     pygame.display.flip()
 
     # Control the frame rate
-    clock.tick(10)
+    clock.tick(fps)
 
 # Quit the game
 pygame.quit()
