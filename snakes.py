@@ -6,7 +6,7 @@ import importlib
 pygame.init()
 
 # Set up the game window
-width, height = 640, 480
+width, height = 800, 600
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Two Players")
 
@@ -39,20 +39,25 @@ game_over = False
 winner = None
 
 # Functions to display game over message
-def display_game_over():
+def display_game_over(winner, game_over_reason):
     font = pygame.font.Font(None, 36)
-    text = font.render("Game Over - Tie!", True, WHITE)
-    text_rect = text.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2))
-    window.blit(text, text_rect)
-
-def display_winner(winner):
-    font = pygame.font.Font(None, 36)
-    if winner == 1:
-        text = font.render("Game Over - Player 1 Wins!", True, WHITE)
+    if winner == 0:
+        top_text = "Game Over - Tie!"
+    elif winner == 1:
+        top_text = "Game Over - Player 1 Wins!"
     elif winner == 2:
-        text = font.render("Game Over - Player 2 Wins!", True, WHITE)
-    text_rect = text.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2))
-    window.blit(text, text_rect)
+        top_text = "Game Over - Player 2 Wins!"
+
+    bottom_text = game_over_reason
+
+    top_text_render = font.render(top_text, True, WHITE)
+    bottom_text_render = font.render(bottom_text, True, WHITE)
+
+    top_text_rect = top_text_render.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2 - 20))
+    bottom_text_rect = bottom_text_render.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2 + 20))
+
+    window.blit(top_text_render, top_text_rect)
+    window.blit(bottom_text_render, bottom_text_rect)
 
 # Import player controller scripts
 player1_controller = importlib.import_module("player1_controller")
@@ -97,10 +102,19 @@ while not game_over:
             or new_head1[0] >= grid_width
             or new_head1[1] < 0
             or new_head1[1] >= grid_height
-            or new_head1 in snake1
-            or new_head1 in snake2
         ):
             collision1 = True
+            collision1_reason = "Snake 1 collided with the wall"
+        elif (
+            new_head1 in snake1
+        ):
+            collision1 = True
+            collision1_reason = "Snake 1 collided with itself"
+        elif (
+            new_head1 in snake2
+        ):
+            collision1 = True
+            collision1_reason = "Snake 1 collided with Snake 2"
         else:
             collision1 = False
         
@@ -109,22 +123,34 @@ while not game_over:
             or new_head2[0] >= grid_width
             or new_head2[1] < 0
             or new_head2[1] >= grid_height
-            or new_head2 in snake2
-            or new_head2 in snake1
         ):
             collision2 = True
+            collision2_reason = "Snake 2 collided with the wall"
+        elif (
+            new_head2 in snake2
+        ):
+            collision2 = True
+            collision2_reason = "Snake 2 collided with itself"
+        elif (
+            new_head2 in snake1
+        ):
+            collision2 = True
+            collision2_reason = "Snake 2 collided with Snake 1"
         else:
             collision2 = False
 
         # Determine the game over state
         if collision1 and collision2:
             game_over = True
-            winner = None
+            game_over_reason = collision1_reason + " while " + collision2_reason
+            winner = 0
         elif collision1:
             game_over = True
+            game_over_reason = collision1_reason
             winner = 2
         elif collision2:
             game_over = True
+            game_over_reason = collision2_reason
             winner = 1
 
         # Check if the snakes have eaten the food
@@ -163,14 +189,11 @@ while not game_over:
     pygame.display.flip()
 
     # Control the frame rate
-    clock.tick(10)
+    clock.tick(16)
 
 # Game over loop
 window.fill(BLACK)
-if winner is None:
-    display_game_over()
-else:
-    display_winner(winner)
+display_game_over(winner, game_over_reason)
 pygame.display.flip()
 
 # Keep the game window open until the user closes it
