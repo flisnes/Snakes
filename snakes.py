@@ -71,8 +71,8 @@ while not game_over:
             game_over = True
 
     # Call the player controller functions
-    direction1 = player1_controller.move(snake1, snake2, food)
-    direction2 = player2_controller.move(snake1, snake2, food)
+    direction1 = player1_controller.move(snake1, snake2, food, direction1)
+    direction2 = player2_controller.move(snake2, snake1, food, direction2)
 
     # Update snake positions
     if not game_over:
