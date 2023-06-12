@@ -38,6 +38,19 @@ direction2 = "LEFT"
 game_over = False
 winner = None
 
+# Import player controller scripts
+player1_controller = importlib.import_module("player1_controller")
+player2_controller = importlib.import_module("player2_controller")
+
+def generate_food(snake1, snake2):
+    while True:
+        food_x = random.randint(0, grid_width - 1)
+        food_y = random.randint(0, grid_height - 1)
+
+        # Check if the generated food position is not occupied by any snake
+        if (food_x, food_y) not in snake1 and (food_x, food_y) not in snake2:
+            return food_x, food_y
+
 # Functions to display game over message
 def display_game_over(winner, game_over_reason):
     font = pygame.font.Font(None, 36)
@@ -58,10 +71,6 @@ def display_game_over(winner, game_over_reason):
 
     window.blit(top_text_render, top_text_rect)
     window.blit(bottom_text_render, bottom_text_rect)
-
-# Import player controller scripts
-player1_controller = importlib.import_module("player1_controller")
-player2_controller = importlib.import_module("player2_controller")
 
 # Game loop
 while not game_over:
@@ -155,12 +164,12 @@ while not game_over:
 
         # Check if the snakes have eaten the food
         if new_head1 == food:
-            food = (random.randint(0, grid_width - 1), random.randint(0, grid_height - 1))
+            food = generate_food(snake1, snake2)
         else:
             snake1.pop()
 
         if new_head2 == food:
-            food = (random.randint(0, grid_width - 1), random.randint(0, grid_height - 1))
+            food = generate_food(snake1, snake2)
         else:
             snake2.pop()
 
