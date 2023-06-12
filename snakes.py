@@ -1,6 +1,17 @@
 import pygame
 import random
 import importlib
+import argparse
+
+# Create an argument parser
+parser = argparse.ArgumentParser(description="Snake Game")
+
+# Add arguments for player controller script filenames
+parser.add_argument("player1_script", help="Filename of the player 1 controller script")
+parser.add_argument("player2_script", help="Filename of the player 2 controller script")
+
+# Parse the command-line arguments
+args = parser.parse_args()
 
 # Initialize Pygame
 pygame.init()
@@ -39,8 +50,8 @@ game_over = False
 winner = None
 
 # Import player controller scripts
-player1_controller = importlib.import_module("player1_controller")
-player2_controller = importlib.import_module("player2_controller")
+player1_controller = __import__(args.player1_script.replace(".py", "").replace(".\\", ""))
+player2_controller = __import__(args.player2_script.replace(".py", "").replace(".\\", ""))
 
 def generate_food(snake1, snake2):
     while True:
