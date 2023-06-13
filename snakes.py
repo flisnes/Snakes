@@ -17,7 +17,7 @@ args = parser.parse_args()
 pygame.init()
 
 # Set up the game window
-width, height = 800, 600
+width, height = 400, 400
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Two Players")
 
@@ -41,13 +41,16 @@ clock = pygame.time.Clock()
 # Define the initial state of the game
 snake1 = [(grid_width // 4, grid_height // 2)]
 snake2 = [(grid_width * 3 // 4, grid_height // 2)]
-food = (random.randint(0, grid_width - 1), random.randint(0, grid_height - 1))
+food = (random.randint(1, grid_width - 2), random.randint(1, grid_height - 2))
+walls = [
+    (x, 0) for x in range(grid_width)] + [(x, grid_height - 1) for x in range(grid_width)] + [(0, y) for y in range(grid_height)] + [(grid_width - 1, y) for y in range(grid_height)
+]
 direction1 = "RIGHT"
 direction2 = "LEFT"
 
 # Define the game state
 game_over = False
-winner = None
+winner = 0
 
 # Import player controller scripts
 player1_controller = __import__(args.player1_script.replace(".py", "").replace(".\\", ""))
@@ -55,17 +58,51 @@ player2_controller = __import__(args.player2_script.replace(".py", "").replace("
 
 def generate_food(snake1, snake2):
     while True:
-        food_x = random.randint(0, grid_width - 1)
-        food_y = random.randint(0, grid_height - 1)
+        food_x = random.randint(1, grid_width - 2)
+        food_y = random.randint(1, grid_height - 2)
 
         # Check if the generated food position is not occupied by any snake
         if (food_x, food_y) not in snake1 and (food_x, food_y) not in snake2:
             return food_x, food_y
+        
+def check_collision(new_head1, new_head2, snake1, snake2):
+
+    game_over_reason = ""
+    winner = 0
+
+    # Check collisions with other snake
+    if new_head1 in snake2 or new_head1 == new_head2:
+            winner += 2
+            game_over_reason = "Snake 1 collided with snake 2"
+    
+    if new_head2 in snake1 or new_head2 == new_head1:
+            winner += 1
+            game_over_reason = "Snake 2 collided with snake 1" # Need to redo game over reason
+
+    # Check collisions with self
+    if new_head1 in snake1:
+            winner += 2
+            game_over_reason = "Snake 1 collided with itself"
+
+    if new_head2 in snake2:
+            winner += 1
+            game_over_reason = "Snake 2 collided with itself"
+    
+    # Check collisions with wall
+    if new_head1 in walls or snake1 in walls:
+            winner += 2
+            game_over_reason = "Snake 1 collided with the wall"
+    
+    if new_head2 in walls or snake2 in walls:
+            winner += 1
+            game_over_reason = "Snake 2 collided with the wall"
+    
+    return winner, game_over_reason
 
 # Functions to display game over message
 def display_game_over(winner, game_over_reason):
     font = pygame.font.Font(None, 36)
-    if winner == 0:
+    if winner == 3:
         top_text = "Game Over - Tie!"
     elif winner == 1:
         top_text = "Game Over - Player 1 Wins!"
@@ -116,71 +153,20 @@ while not game_over:
         elif direction2 == "RIGHT":
             new_head2 = (head2[0] + 1, head2[1])
 
-        # Check for collisions with walls and other snakes
-        if (
-            new_head1[0] < 0
-            or new_head1[0] >= grid_width
-            or new_head1[1] < 0
-            or new_head1[1] >= grid_height
-        ):
-            collision1 = True
-            collision1_reason = "Snake 1 collided with the wall"
-        elif (
-            new_head1 in snake1
-        ):
-            collision1 = True
-            collision1_reason = "Snake 1 collided with itself"
-        elif (
-            new_head1 in snake2
-        ):
-            collision1 = True
-            collision1_reason = "Snake 1 collided with Snake 2"
-        else:
-            collision1 = False
-        
-        if (
-            new_head2[0] < 0
-            or new_head2[0] >= grid_width
-            or new_head2[1] < 0
-            or new_head2[1] >= grid_height
-        ):
-            collision2 = True
-            collision2_reason = "Snake 2 collided with the wall"
-        elif (
-            new_head2 in snake2
-        ):
-            collision2 = True
-            collision2_reason = "Snake 2 collided with itself"
-        elif (
-            new_head2 in snake1
-        ):
-            collision2 = True
-            collision2_reason = "Snake 2 collided with Snake 1"
-        else:
-            collision2 = False
+        winner, game_over_reason = check_collision(new_head1, new_head2, snake1, snake2)
 
-        # Determine the game over state
-        if collision1 and collision2:
+        if game_over_reason != "":
             game_over = True
-            game_over_reason = collision1_reason + " while " + collision2_reason
-            winner = 0
-        elif collision1:
-            game_over = True
-            game_over_reason = collision1_reason
-            winner = 2
-        elif collision2:
-            game_over = True
-            game_over_reason = collision2_reason
-            winner = 1
+            break
 
         # Check if the snakes have eaten the food
         if new_head1 == food:
-            food = generate_food(snake1, snake2)
+            food = generate_food(snake1, snake2, walls)
         else:
             snake1.pop()
 
         if new_head2 == food:
-            food = generate_food(snake1, snake2)
+            food = generate_food(snake1, snake2, walls)
         else:
             snake2.pop()
 
@@ -189,6 +175,12 @@ while not game_over:
 
     # Clear the window
     window.fill(BLACK)
+
+    # Draw the walls
+    for brick in walls:
+        pygame.draw.rect(
+            window, WHITE, (brick[0] * cell_size, brick[1] * cell_size, cell_size, cell_size)
+        )
 
     # Draw the snakes
     for segment in snake1:
