@@ -1,6 +1,6 @@
 # Snakes
 
-This is a simple implementation of the classic Snake game using Python and Pygame.
+This is a simple implementation of the classic Snake with a twist. Two players compete against each other to eat the most food and survive the longest. In order to control your snake, you need to program its behavior in a controller script.
 
 ## How to Play
 
@@ -10,7 +10,7 @@ This is a simple implementation of the classic Snake game using Python and Pygam
 
 3. **Eating Food:** The game area contains food items represented by red squares. When a snake eats a food item, it grows longer, and the player earns a point.
 
-4. **Collision Detection:**
+4. **Collision Detection:** The game checks for collisions.
    - If a snake's head collides with its own body, it results in a game over.
    - If a snake's head collides with the opponent's snake, it results in a game over.
    - If a snake's head collides with the walls, it results in a game over.
@@ -25,7 +25,7 @@ This is a simple implementation of the classic Snake game using Python and Pygam
 
 The game allows each player to control their snake by providing a custom player controller script. These scripts should follow the provided template and provide the desired logic for controlling the snake's movement. The scripts should be named and provided as command-line arguments when running the game.
 
-Please refer to the `player_controller_template.py` file for an example player controller script.
+Please refer to the `snake_controller_template.py` file for an example snake controller script.
 
 ## Dependencies
 
@@ -38,9 +38,13 @@ Please refer to the `player_controller_template.py` file for an example player c
 
 2. Clone the repository or download the source code files.
 
-3. Open a terminal or command prompt and navigate to the project directory.
+3. Program your snake's behavior in a controller script.
 
-4. Run the following command to start the game:
+4. Get a friend (or enemy) to do the same.
+
+4. Open a terminal or command prompt and navigate to the project directory.
+
+5. Run the following command to start the game:
 
    ```shell
    python snake_game.py --player1_script player1_controller.py --player2_script player2_controller.py
