@@ -23,7 +23,7 @@ pygame.display.set_caption("Snake Game - Two Players")
 
 # Define colors
 BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
+GREEN = (50, 200, 50)
 BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
@@ -51,6 +51,8 @@ direction2 = "LEFT"
 # Define the game state
 game_over = False
 winner = 0
+snake1_score = 0
+snake2_score = 0
 
 # Import player controller scripts
 player1_controller = __import__(args.player1_script.replace(".py", "").replace(".\\", ""))
@@ -114,8 +116,8 @@ def display_game_over(winner, game_over_reason):
     top_text_render = font.render(top_text, True, WHITE)
     bottom_text_render = font.render(bottom_text, True, WHITE)
 
-    top_text_rect = top_text_render.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2 - 20))
-    bottom_text_rect = bottom_text_render.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2 + 20))
+    top_text_rect = top_text_render.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2 - cell_size))
+    bottom_text_rect = bottom_text_render.get_rect(center=(grid_width * cell_size // 2, grid_height * cell_size // 2 + cell_size))
 
     window.blit(top_text_render, top_text_rect)
     window.blit(bottom_text_render, bottom_text_rect)
@@ -162,11 +164,13 @@ while not game_over:
         # Check if the snakes have eaten the food
         if new_head1 == food:
             food = generate_food(snake1, snake2, walls)
+            snake1_score += 1
         else:
             snake1.pop()
 
         if new_head2 == food:
             food = generate_food(snake1, snake2, walls)
+            snake2_score += 1
         else:
             snake2.pop()
 
@@ -196,6 +200,13 @@ while not game_over:
     pygame.draw.rect(
         window, RED, (food[0] * cell_size, food[1] * cell_size, cell_size, cell_size)
     )
+
+    # Draw the scores
+    font = pygame.font.Font(None, 24)
+    score_text1 = font.render(str(snake1_score), True, GREEN)
+    score_text2 = font.render(str(snake2_score), True, BLUE)
+    window.blit(score_text1, (0, 0))
+    window.blit(score_text2, (grid_width*cell_size - cell_size, 0))
 
     # Update the display
     pygame.display.flip()
