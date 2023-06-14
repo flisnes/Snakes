@@ -17,7 +17,7 @@ args = parser.parse_args()
 pygame.init()
 
 # Set up the game window
-width, height = 400, 400
+width, height = 800, 800
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Two Players")
 
@@ -70,34 +70,56 @@ def generate_food(snake1, snake2):
 def check_collision(new_head1, new_head2, snake1, snake2):
 
     game_over_reason = ""
+    snake1_collision_reason = ""
+    snake2_collision_reason = ""
+    snake1_collided = False
+    snake2_collided = False
     winner = 0
 
+    # Head on collision
+    if new_head1 == new_head2:
+        winner += 3
+        snake1_collided = True
+        snake2_collided = True
+        snake1_collision_reason = "Head on collision"
+
     # Check collisions with other snake
-    if new_head1 in snake2 or new_head1 == new_head2:
-            winner += 2
-            game_over_reason = "Snake 1 collided with snake 2"
+    if new_head1 in snake2:
+        winner += 2
+        snake1_collided = True
+        snake1_collision_reason = "Snake 1 collided with Snake 2"
     
-    if new_head2 in snake1 or new_head2 == new_head1:
-            winner += 1
-            game_over_reason = "Snake 2 collided with snake 1" # Need to redo game over reason
+    if new_head2 in snake1:
+        winner += 1
+        snake2_collided = True
+        snake2_collision_reason = "Snake 2 collided with Snake 1"
 
     # Check collisions with self
     if new_head1 in snake1:
-            winner += 2
-            game_over_reason = "Snake 1 collided with itself"
+        winner += 2
+        snake1_collided = True
+        snake1_collision_reason = "Snake 1 collided with itself"
 
     if new_head2 in snake2:
-            winner += 1
-            game_over_reason = "Snake 2 collided with itself"
+        winner += 1
+        snake2_collided = True
+        snake2_collision_reason = "Snake 2 collided with itself"
     
     # Check collisions with wall
     if new_head1 in walls or snake1 in walls:
-            winner += 2
-            game_over_reason = "Snake 1 collided with the wall"
+        winner += 2
+        snake1_collided = True
+        snake1_collision_reason = "Snake 1 collided with the wall"
     
     if new_head2 in walls or snake2 in walls:
-            winner += 1
-            game_over_reason = "Snake 2 collided with the wall"
+        winner += 1
+        snake2_collided = True
+        snake2_collision_reason = "Snake 2 collided with the wall"
+
+    if snake1_collided and snake2_collided:
+        game_over_reason = snake1_collision_reason + " while " + snake2_collision_reason
+    else:
+        game_over_reason = snake1_collision_reason + snake2_collision_reason
     
     return winner, game_over_reason
 
