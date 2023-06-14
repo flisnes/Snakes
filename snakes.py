@@ -163,13 +163,13 @@ while not game_over:
 
         # Check if the snakes have eaten the food
         if new_head1 == food:
-            food = generate_food(snake1, snake2, walls)
+            food = generate_food(snake1, snake2)
             snake1_score += 1
         else:
             snake1.pop()
 
         if new_head2 == food:
-            food = generate_food(snake1, snake2, walls)
+            food = generate_food(snake1, snake2)
             snake2_score += 1
         else:
             snake2.pop()
